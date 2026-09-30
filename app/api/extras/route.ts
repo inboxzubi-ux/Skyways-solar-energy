@@ -1,9 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-let expenses = [];
-let projects = [];
+interface Expense {
+  id: number;
+  createdAt: Date;
+  [key: string]: unknown;
+}
 
-export async function GET(req) {
+interface Project {
+  id: number;
+  createdAt: Date;
+  [key: string]: unknown;
+}
+
+let expenses: Expense[] = [];
+let projects: Project[] = [];
+
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get('type');
   if (type === 'projects') {
@@ -12,7 +24,7 @@ export async function GET(req) {
   return NextResponse.json(expenses);
 }
 
-export async function POST(req) {
+export async function POST(req: NextRequest) {
   const body = await req.json();
   if (body.type === 'project') {
     const newProj = { id: projects.length + 1, ...body, createdAt: new Date() };

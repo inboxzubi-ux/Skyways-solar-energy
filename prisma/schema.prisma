@@ -1,0 +1,61 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Importer {
+  id        Int       @id @default(autoincrement())
+  name      String
+  company   String?
+  phone     String?
+  address   String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+model Product {
+  id           Int           @id @default(autoincrement())
+  name         String
+  category     String        // Panel, Inverter, Battery, Wire, etc.
+  stockQty     Int           @default(0)
+  buyPrice     Float
+  sellPrice    Float
+  importerId   Int?
+  importer     Importer?     @relation(fields: [importerId], references: [id])
+  invoiceItems InvoiceItem[]
+  createdAt    DateTime      @default(now())
+}
+
+model Customer {
+  id        Int       @id @default(autoincrement())
+  name      String
+  phone     String
+  address   String?
+  cnic      String?
+  invoices  Invoice[]
+  createdAt DateTime  @default(now())
+}
+
+model Invoice {
+  id          Int           @id @default(autoincrement())
+  customerId  Int
+  customer    Customer      @relation(fields: [customerId], references: [id])
+  totalAmount Float
+  paidAmount  Float
+  items       InvoiceItem[]
+  createdAt   DateTime      @default(now())
+}
+
+model InvoiceItem {
+  id        Int     @id @default(autoincrement())
+  invoiceId Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  qty       Int
+  unitPrice Float
+}
